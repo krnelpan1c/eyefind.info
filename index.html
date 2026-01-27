@@ -26,7 +26,7 @@
         <div class="header-content__info">
           <div class="header-content__info--text">
             <p class="location">Vinewood Hills</p>
-            <p class="day">Sun</p>
+            <p class="day" id="current-day"></p>
           </div>
           <div class="header-content__info--icon">
             <span class="weather"></span>
@@ -162,5 +162,15 @@
 		document.addEventListener('DOMContentLoaded', function() {
 		  document.getElementById('searchInput').focus();
 		});
+    function updateClock() {
+      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const now = new Date();
+      const dayIndex = now.getDay();
+      const currentDay = days[dayIndex];
+    
+      document.getElementById('current-day').textContent = currentDay;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
 </script>
 </html>
