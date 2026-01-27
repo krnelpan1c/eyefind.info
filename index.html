@@ -152,13 +152,13 @@
   </body>
 	<script>
 		document.getElementById('searchInput').addEventListener('keypress', function(e) {
-		  if (e.key === 'Enter') {
-		    const searchQuery = this.value.trim();
-		    if (searchQuery !== '') {
-		      window.location.href = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
-		    }
-		  }
-		});
+  if (e.key === 'Enter') {
+    const searchQuery = this.value.trim();
+    if (searchQuery !== '') {
+      window.location.href = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
+    }
+  }
+});
 		document.addEventListener('DOMContentLoaded', function() {
 		  document.getElementById('searchInput').focus();
 		});
