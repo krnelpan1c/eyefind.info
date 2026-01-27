@@ -33,16 +33,16 @@
           </div>
         </div>
       </section>
-      <section class="header-searchbar">
-        <form id="googleSearchForm" action="https://www.google.com/search" method="GET" target="_blank">
-          <div class="header-searchbar__input">
-            <span class="magnifier"></span>
+     <section class="header-searchbar">
+        <div class="header-searchbar__input">
+          <span class="magnifier"></span>
+          <form id="googleSearchForm" action="https://www.google.com/search" method="GET" target="_blank">
             <input type="text" name="q" placeholder="Search Eyefind">
-          </div>
-          <div class="header-searchbar__button">
-            <a class="random" href="">Random</a>
-          </div>
-        </form>
+          </form>
+        </div>
+        <div class="header-searchbar__button">
+          <a class="random" href="">Random</a>
+        </div>
       </section>
     </header>
     <main>
@@ -152,4 +152,13 @@
 
     </footer>
   </body>
+	<script>
+document.getElementById('googleSearchForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const searchQuery = this.querySelector('input[name="q"]').value;
+  if (searchQuery.trim() !== '') {
+    window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`, '_blank');
+  }
+});
+</script>
 </html>
