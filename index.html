@@ -151,11 +151,12 @@
     </footer>
   </body>
 	<script>
-document.getElementById('googleSearchForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  const searchQuery = this.querySelector('input[name="q"]').value;
-  if (searchQuery.trim() !== '') {
-    window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`, '_blank');
+document.getElementById('searchInput').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    const searchQuery = this.value.trim();
+    if (searchQuery !== '') {
+      window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`, '_blank');
+    }
   }
 });
 </script>
