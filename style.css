@@ -91,6 +91,7 @@ header {
   margin-left: auto;
 }
 .header-searchbar__input {
+  position: relative;
   display: flex;
   width: 100%;
   height: 30px;
@@ -98,6 +99,33 @@ header {
   border-radius: 5px;
   margin-right: 10px;
   background-color: var(--white-eye);
+}
+.autocomplete-items {
+  position: absolute;
+  border: 1px solid var(--dark-gray);
+  border-bottom: none;
+  border-top: none;
+  z-index: 99;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--white-eye);
+  border-radius: 0 0 5px 5px;
+  overflow: hidden;
+}
+.autocomplete-items div {
+  padding: 10px;
+  cursor: url('./assets/icons/xp-middle-finger-2.cur'), pointer;
+  background-color: var(--white-eye);
+  border-bottom: 1px solid var(--dark-gray);
+  font-size: 1.4rem;
+}
+.autocomplete-items div:hover {
+  background-color: var(--gray-eye);
+}
+.autocomplete-active {
+  background-color: var(--blue-eye) !important;
+  color: var(--white-eye);
 }
 .header-searchbar__input input {
   width: 90%;
