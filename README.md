@@ -1,7 +1,5 @@
 # eyefind.info
-
-GTA V web portal eyefind.info project  
-Search the internet using Eyefind.info.  
+The search engine that knows everything about you, mostly because it drives around in cars collecting all your private data
   
 You can set it as your new tab page using the following extensions:  
 Chrome, Edge, Brave, etc: [New Tab Redirect](https://chromewebstore.google.com/detail/new-tab-redirect/icpgjfneehieebagbmdbhnlpiopdcmna)  
