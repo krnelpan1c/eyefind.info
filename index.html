@@ -164,7 +164,7 @@
   </footer>
 </body>
 <script>
-  // History storage and Autocomplete
+  // hist storage and autocomplete
   const searchInput = document.getElementById('searchInput');
   const autocompleteList = document.getElementById('autocomplete-list');
   const HISTORY_KEY = 'eyefind_search_history';
@@ -190,7 +190,7 @@
     autocompleteList.innerHTML = '';
     if (!val) return false;
 
-    const matches = history.filter(item => 
+    const matches = history.filter(item =>
       item.toLowerCase().includes(val.toLowerCase())
     );
 
@@ -202,8 +202,8 @@
       b.innerHTML += "<strong>" + match.substr(index, val.length) + "</strong>";
       b.innerHTML += match.substr(index + val.length);
       b.innerHTML += "<input type='hidden' value='" + match + "'>";
-      
-      b.addEventListener('click', function(e) {
+
+      b.addEventListener('click', function (e) {
         searchInput.value = this.getElementsByTagName('input')[0].value;
         closeAllLists();
         performSearch(searchInput.value);
@@ -215,7 +215,7 @@
   function performSearch(searchQuery) {
     if (searchQuery !== '') {
       saveToHistory(searchQuery);
-      // Check if it's a URL or domain
+      // check if url or domain
       const isFullUrl = /^https?:\/\//i.test(searchQuery);
       const isDomain = !searchQuery.includes(' ') && searchQuery.includes('.') && !searchQuery.startsWith('.') && !searchQuery.endsWith('.') && searchQuery.split('.').pop().length >= 2;
       const isLocalhost = /^localhost(:\d+)?(\/.*)?$/i.test(searchQuery);
@@ -239,11 +239,11 @@
     }
   }
 
-  searchInput.addEventListener('input', function(e) {
+  searchInput.addEventListener('input', function (e) {
     showSuggestions(this.value);
   });
 
-  searchInput.addEventListener('keydown', function(e) {
+  searchInput.addEventListener('keydown', function (e) {
     let x = document.getElementById("autocomplete-list");
     if (x) x = x.getElementsByTagName("div");
     if (e.keyCode == 40) { // Down
@@ -272,18 +272,18 @@
 
   function removeActive(x) {
     for (let i = 0; i < x.length; i++) {
-        x[i].classList.remove("autocomplete-active");
+      x[i].classList.remove("autocomplete-active");
     }
   }
 
   document.addEventListener('click', function (e) {
-      closeAllLists(e.target);
+    closeAllLists(e.target);
   });
 
   // Re-map the original enter listener to use performSearch
   searchInput.addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
-        // Handled by keydown for autocomplete selection
+      // Handled by keydown for autocomplete selection
     }
   });
 
@@ -302,6 +302,54 @@
   }
   updateClock();
   setInterval(updateClock, 1000);
+
+  // location randomization
+  const gtaLocations = [
+    'Vinewood Hills',
+    'Del Perro',
+    'Rockford Plaza',
+    'Vespucci Beach',
+    'Mission Row',
+    'Strawberry',
+    'Pillbox Hill',
+    'Downtown',
+    'Sandy Shores',
+    'Grapeseed',
+    'Paleto Bay',
+    'Mirror Park',
+    'Little Seoul',
+    'Davis',
+    'Rancho',
+    'La Mesa',
+    'Cypress Flats',
+    'Elysian Island',
+    'Los Santos International Airport',
+    'Pacific Bluffs',
+    'Chumash',
+    'Richman',
+    'Morningwood',
+    'Great Chaparral',
+    'Grand Senora Desert',
+    'Alamo Sea',
+    'Tongva Hills',
+    'Banham Canyon',
+    'Zancudo River',
+    'Mount Chiliad',
+    'Mount Josiah',
+    'Mount Gordo',
+    'Braddock Pass',
+    'Raton Canyon',
+    'Palomino Highlands',
+    'Tataviam Mountains'
+  ];
+
+  function randomizeLocation() {
+    const locationElement = document.querySelector('.location');
+    if (locationElement) {
+      const randomIndex = Math.floor(Math.random() * gtaLocations.length);
+      locationElement.textContent = gtaLocations[randomIndex];
+    }
+  }
 
   //featured websites randomization
   const featuredSitesDir = './assets/img/featured-sites/';
@@ -357,7 +405,8 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     randomizeFeatured();
-    // Re-focus because we added more listeners
+    randomizeLocation();
+    // Re-focus
     document.getElementById('searchInput').focus();
   });
 </script>
