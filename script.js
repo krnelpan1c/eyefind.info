@@ -183,6 +183,83 @@ function randomizeFeatured() {
   });
 }
 
+const homeContent = document.getElementById('home-content');
+const subpageContent = document.getElementById('subpage-content');
+const featuredSitesSection = document.querySelector('.eyefind-featured');
+
+async function loadSubpage(url) {
+  if (!subpageContent || !homeContent) return;
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Network response was not ok');
+    const html = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const content = doc.querySelector('.main-container');
+
+    if (content) {
+      // Fix paths in the loaded content
+      const elementsWithSrc = content.querySelectorAll('[src]');
+      elementsWithSrc.forEach(el => {
+        const src = el.getAttribute('src');
+        if (src && src.startsWith('../')) {
+          el.setAttribute('src', src.replace('../', './'));
+        }
+      });
+
+      const elementsWithHref = content.querySelectorAll('[href]');
+      elementsWithHref.forEach(el => {
+        const href = el.getAttribute('href');
+        if (href && href.startsWith('../')) {
+          el.setAttribute('href', href.replace('../', './'));
+        } else if (href === './index.html' || href === '../index.html') {
+          el.addEventListener('click', (e) => {
+            e.preventDefault();
+            showHome();
+            history.pushState({ home: true }, '', './index.html');
+          });
+        }
+      });
+
+      subpageContent.innerHTML = content.innerHTML;
+      homeContent.style.display = 'none';
+      subpageContent.style.display = 'flex';
+      
+      // Hide featured sites in category pages
+      if (featuredSitesSection) {
+        featuredSitesSection.style.display = 'none';
+      }
+
+      // Focus search input and scroll to top
+      if (searchInput) searchInput.focus();
+      window.scrollTo(0, 0);
+
+      // Update featured sites randomization (though hidden, keeping it for data consistency)
+      randomizeFeatured();
+    }
+  } catch (error) {
+    console.error('Error loading subpage:', error);
+    showHome();
+  }
+}
+
+function showHome() {
+  if (homeContent && subpageContent) {
+    homeContent.style.display = 'flex';
+    subpageContent.style.display = 'none';
+    subpageContent.innerHTML = '';
+    
+    // Show featured sites on home page
+    if (featuredSitesSection) {
+      featuredSitesSection.style.display = 'block';
+    }
+
+    window.scrollTo(0, 0);
+    randomizeFeatured();
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   if (searchInput) {
     searchInput.focus();
@@ -191,4 +268,42 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(updateClock, 1000);
   randomizeLocation();
   randomizeFeatured();
+
+  // Check if we should load a subpage from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const page = urlParams.get('page');
+  if (page) {
+    loadSubpage(`./html/${page}.html`);
+  }
+
+  // Category links navigation
+  const categoryLinks = document.querySelectorAll('.categories--link');
+  categoryLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const href = link.getAttribute('href');
+      const pageName = href.split('/').pop().replace('.html', '');
+      loadSubpage(href);
+      history.pushState({ page: pageName }, '', `?page=${pageName}`);
+    });
+  });
+
+  // Logo link navigation
+  const logoLink = document.querySelector('.header-content__media a');
+  if (logoLink) {
+    logoLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      showHome();
+      history.pushState({ home: true }, '', './index.html');
+    });
+  }
+
+  // Handle back/forward buttons
+  window.addEventListener('popstate', (e) => {
+    if (e.state && e.state.page) {
+      loadSubpage(`./html/${e.state.page}.html`);
+    } else {
+      showHome();
+    }
+  });
 });
