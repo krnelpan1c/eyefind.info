@@ -245,9 +245,50 @@ header {
   justify-content: space-evenly;
 }
 .search-result {
+  width: 100%;
   font-size: 1.6rem;
   line-height: 1.8rem;
   margin-right: auto;
+  margin-bottom: 20px;
+}
+.result-content {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto 15px auto;
+  padding: 15px;
+  background-color: var(--gray-eye);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.result-content__img {
+  width: 170px;
+  height: 78px;
+  flex-shrink: 0;
+}
+.result-content__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.result-content__text {
+  flex: 1;
+}
+.result-content__text a {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: black;
+  text-decoration: none;
+  margin-bottom: 4px;
+}
+.result-content__text a:hover {
+  color: var(--blue-eye);
+}
+.result-content__text p {
+  font-size: 1.3rem;
+  color: rgb(78, 78, 78);
+  line-height: 1.6rem;
 }
 .news-website-container {
   width: 100%;
@@ -446,3 +487,18 @@ header {
   border: 4px var(--blue-eye) solid;
   cursor: url('./assets/icons/xp-middle-finger-2.cur'), pointer;
 }
+
+#subpage-content {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
