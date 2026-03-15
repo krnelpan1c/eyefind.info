@@ -47,6 +47,37 @@ function showSuggestions(val) {
   });
 }
 
+// Search engines logic
+const defaultEngines = [
+  { name: 'Google', tag: '@google', url: 'https://www.google.com/search?q=' },
+  { name: 'DuckDuckGo', tag: '@ddg', url: 'https://duckduckgo.com/?q=' },
+  { name: 'Bing', tag: '@bing', url: 'https://www.bing.com/search?q=' }
+];
+
+function getAllEngines() {
+  const customEngines = JSON.parse(localStorage.getItem('eyefind_custom_engines')) || [];
+  return [...defaultEngines, ...customEngines];
+}
+
+function getSearchUrl(query) {
+  const engines = getAllEngines();
+  let defaultEngineTag = localStorage.getItem('eyefind_default_engine') || '@google';
+  let selectedEngine = engines.find(e => e.tag === defaultEngineTag) || engines[0];
+  let finalQuery = query;
+
+  let queryParts = query.trim().split(/\s+/);
+  if (queryParts.length > 0 && queryParts[0].startsWith('@')) {
+    let firstWord = queryParts[0];
+    let mentionedEngine = engines.find(e => e.tag.toLowerCase() === firstWord.toLowerCase());
+    if (mentionedEngine) {
+      selectedEngine = mentionedEngine;
+      finalQuery = queryParts.slice(1).join(' ');
+    }
+  }
+
+  return selectedEngine.url + encodeURIComponent(finalQuery);
+}
+
 function performSearch(searchQuery) {
   if (searchQuery !== '') {
     saveToHistory(searchQuery);
@@ -60,7 +91,7 @@ function performSearch(searchQuery) {
     } else if (isDomain || isLocalhost) {
       window.open(`http://${searchQuery}`, '_self');
     } else {
-      window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`, '_self');
+      window.open(getSearchUrl(searchQuery), '_self');
     }
   }
 }
@@ -225,7 +256,7 @@ async function loadSubpage(url) {
       subpageContent.innerHTML = content.innerHTML;
       homeContent.style.display = 'none';
       subpageContent.style.display = 'flex';
-      
+
       // Hide featured sites in category pages
       if (featuredSitesSection) {
         featuredSitesSection.style.display = 'none';
@@ -249,7 +280,7 @@ function showHome() {
     homeContent.style.display = 'flex';
     subpageContent.style.display = 'none';
     subpageContent.innerHTML = '';
-    
+
     // Show featured sites on home page
     if (featuredSitesSection) {
       featuredSitesSection.style.display = 'block';
@@ -306,4 +337,121 @@ document.addEventListener('DOMContentLoaded', () => {
       showHome();
     }
   });
+
+  // --- Search Settings Modal Logic ---
+  const settingsModal = document.getElementById('settingsModal');
+  const settingsBtn = document.getElementById('settingsBtn');
+  const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+  const defaultEngineSelect = document.getElementById('defaultEngineSelect');
+  const engineListContainer = document.getElementById('engineList');
+  const addEngineBtn = document.getElementById('addEngineBtn');
+
+  if (settingsBtn && settingsModal) {
+    settingsBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      populateSettings();
+      settingsModal.style.display = 'flex';
+      closeAllLists();
+    });
+
+    closeSettingsBtn.addEventListener('click', () => {
+      settingsModal.style.display = 'none';
+      if (searchInput) searchInput.focus();
+    });
+
+    window.addEventListener('click', (e) => {
+      if (e.target === settingsModal) {
+        settingsModal.style.display = 'none';
+        if (searchInput) searchInput.focus();
+      }
+    });
+
+    defaultEngineSelect.addEventListener('change', (e) => {
+      localStorage.setItem('eyefind_default_engine', e.target.value);
+    });
+
+    addEngineBtn.addEventListener('click', () => {
+      const name = document.getElementById('newEngineName').value.trim();
+      let tag = document.getElementById('newEngineTag').value.trim();
+      const url = document.getElementById('newEngineUrl').value.trim();
+
+      if (!name || !tag || !url) {
+        alert('Please fill out all fields.');
+        return;
+      }
+
+      if (!tag.startsWith('@')) {
+        tag = '@' + tag;
+      }
+
+      const customEngines = JSON.parse(localStorage.getItem('eyefind_custom_engines')) || [];
+      const allEngines = [...defaultEngines, ...customEngines];
+
+      if (allEngines.some(e => e.tag.toLowerCase() === tag.toLowerCase())) {
+        alert('An engine with this tag already exists.');
+        return;
+      }
+
+      customEngines.push({ name, tag, url });
+      localStorage.setItem('eyefind_custom_engines', JSON.stringify(customEngines));
+
+      document.getElementById('newEngineName').value = '';
+      document.getElementById('newEngineTag').value = '';
+      document.getElementById('newEngineUrl').value = '';
+
+      populateSettings();
+    });
+
+    function populateSettings() {
+      if (!defaultEngineSelect) return;
+
+      const engines = getAllEngines();
+      const currentDefault = localStorage.getItem('eyefind_default_engine') || '@google';
+
+      // Populate dropdown
+      defaultEngineSelect.innerHTML = '';
+      engines.forEach(engine => {
+        const option = document.createElement('option');
+        option.value = engine.tag;
+        option.textContent = `${engine.name} (${engine.tag})`;
+        if (engine.tag === currentDefault) option.selected = true;
+        defaultEngineSelect.appendChild(option);
+      });
+
+      // Populate custom engines list
+      if (engineListContainer) {
+        engineListContainer.innerHTML = '';
+        const customEngines = JSON.parse(localStorage.getItem('eyefind_custom_engines')) || [];
+
+        if (customEngines.length === 0) {
+          engineListContainer.innerHTML = '<div class="engine-item" style="color: gray;">No custom engines added yet.</div>';
+        } else {
+          customEngines.forEach((engine, index) => {
+            const item = document.createElement('div');
+            item.className = 'engine-item';
+
+            const info = document.createElement('div');
+            info.innerHTML = `<strong>${engine.name}</strong> <span style="color: var(--dark-blue);">${engine.tag}</span>`;
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn btn-danger';
+            deleteBtn.textContent = 'Remove';
+            deleteBtn.onclick = () => {
+              customEngines.splice(index, 1);
+              localStorage.setItem('eyefind_custom_engines', JSON.stringify(customEngines));
+
+              if (engine.tag === document.getElementById('defaultEngineSelect').value) {
+                localStorage.setItem('eyefind_default_engine', '@google');
+              }
+              populateSettings();
+            };
+
+            item.appendChild(info);
+            item.appendChild(deleteBtn);
+            engineListContainer.appendChild(item);
+          });
+        }
+      }
+    }
+  }
 });

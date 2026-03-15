@@ -45,7 +45,10 @@
         <div id="autocomplete-list" class="autocomplete-items"></div>
       </div>
       <div class="header-searchbar__button">
-        <a class="random" href="">Random</a>
+        <a class="random" href="#">Random</a>
+      </div>
+      <div class="header-searchbar__settings">
+        <a id="settingsBtn" href="#" title="Settings">&#9881;</a>
       </div>
     </section>
   </header>
@@ -163,6 +166,31 @@
   <footer>
 
   </footer>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Search Settings</h2>
+        <span class="close-btn" id="closeSettingsBtn">&times;</span>
+      </div>
+      <div class="settings-section">
+        <label for="defaultEngineSelect">Default Search Engine:</label>
+        <select id="defaultEngineSelect"></select>
+      </div>
+      <div class="settings-section">
+        <label>Custom Search Engines:</label>
+        <div id="engineList" class="engine-list"></div>
+      </div>
+      <div class="settings-section" style="border-top: 1px solid var(--dark-gray); padding-top: 10px;">
+        <label>Add New Custom Engine:</label>
+        <input type="text" id="newEngineName" placeholder="Name (e.g. YouTube)">
+        <input type="text" id="newEngineTag" placeholder="@mention_tag (e.g. @yt)">
+        <input type="text" id="newEngineUrl" placeholder="Search URL (e.g. https://youtube.com/results?search_query=)">
+        <button id="addEngineBtn" class="btn">Add Engine</button>
+      </div>
+    </div>
+  </div>
 </body>
 <script src="./script.js"></script>
 
