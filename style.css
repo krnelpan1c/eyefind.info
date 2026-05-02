@@ -687,3 +687,34 @@ a {
   padding: 4px 8px;
   font-size: 1.2rem;
 }
+
+/* Tabs styling */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--dark-gray);
+  margin-bottom: 15px;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 10px 20px;
+  cursor: url('./assets/icons/xp-middle-finger-2.cur'), pointer;
+  font-weight: bold;
+  font-size: 1.4rem;
+  color: var(--dark-gray);
+}
+
+.tab-btn.active {
+  color: var(--dark-blue);
+  border-bottom: 2px solid var(--dark-blue);
+  margin-bottom: -1px;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}

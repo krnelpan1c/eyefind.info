@@ -174,20 +174,33 @@
         <h2>Search Settings</h2>
         <span class="close-btn" id="closeSettingsBtn">&times;</span>
       </div>
-      <div class="settings-section">
-        <label for="defaultEngineSelect">Default Search Engine:</label>
-        <select id="defaultEngineSelect"></select>
+      <div class="tabs">
+        <button class="tab-btn active" data-target="generalSettings">General</button>
+        <button class="tab-btn" data-target="searxngSettings">SearXNG</button>
       </div>
-      <div class="settings-section">
-        <label>Custom Search Engines:</label>
-        <div id="engineList" class="engine-list"></div>
+      <div id="generalSettings" class="tab-content active">
+        <div class="settings-section">
+          <label for="defaultEngineSelect">Default Search Engine:</label>
+          <select id="defaultEngineSelect"></select>
+        </div>
+        <div class="settings-section">
+          <label>Custom Search Engines:</label>
+          <div id="engineList" class="engine-list"></div>
+        </div>
+        <div class="settings-section" style="border-top: 1px solid var(--dark-gray); padding-top: 10px;">
+          <label>Add New Custom Engine:</label>
+          <input type="text" id="newEngineName" placeholder="Name (e.g. YouTube)">
+          <input type="text" id="newEngineTag" placeholder="@mention_tag (e.g. @yt)">
+          <input type="text" id="newEngineUrl" placeholder="Search URL (e.g. https://youtube.com/results?search_query=)">
+          <button id="addEngineBtn" class="btn">Add Engine</button>
+        </div>
       </div>
-      <div class="settings-section" style="border-top: 1px solid var(--dark-gray); padding-top: 10px;">
-        <label>Add New Custom Engine:</label>
-        <input type="text" id="newEngineName" placeholder="Name (e.g. YouTube)">
-        <input type="text" id="newEngineTag" placeholder="@mention_tag (e.g. @yt)">
-        <input type="text" id="newEngineUrl" placeholder="Search URL (e.g. https://youtube.com/results?search_query=)">
-        <button id="addEngineBtn" class="btn">Add Engine</button>
+      <div id="searxngSettings" class="tab-content">
+        <div class="settings-section">
+          <label for="searxngEndpointInput">SearXNG Endpoint URL:</label>
+          <input type="text" id="searxngEndpointInput" placeholder="http://localhost:8080">
+          <button id="saveSearxngBtn" class="btn" style="margin-top: 10px;">Save Endpoint</button>
+        </div>
       </div>
     </div>
   </div>

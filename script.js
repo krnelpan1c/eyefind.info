@@ -51,7 +51,8 @@ function showSuggestions(val) {
 const defaultEngines = [
   { name: 'Google', tag: '@google', url: 'https://www.google.com/search?q=' },
   { name: 'DuckDuckGo', tag: '@ddg', url: 'https://duckduckgo.com/?q=' },
-  { name: 'Bing', tag: '@bing', url: 'https://www.bing.com/search?q=' }
+  { name: 'Bing', tag: '@bing', url: 'https://www.bing.com/search?q=' },
+  { name: 'SearXNG', tag: '@searxng', url: '' }
 ];
 
 function getAllEngines() {
@@ -73,6 +74,10 @@ function getSearchUrl(query) {
       selectedEngine = mentionedEngine;
       finalQuery = queryParts.slice(1).join(' ');
     }
+  }
+
+  if (selectedEngine.name === 'SearXNG') {
+    return '?page=results&q=' + encodeURIComponent(finalQuery);
   }
 
   return selectedEngine.url + encodeURIComponent(finalQuery);
@@ -268,6 +273,12 @@ async function loadSubpage(url) {
 
       // Update featured sites randomization (though hidden, keeping it for data consistency)
       randomizeFeatured();
+
+      if (url.includes('results.html')) {
+        const params = new URLSearchParams(window.location.search);
+        const q = params.get('q');
+        if (q) fetchSearxngResults(q);
+      }
     }
   } catch (error) {
     console.error('Error loading subpage:', error);
@@ -346,7 +357,32 @@ document.addEventListener('DOMContentLoaded', () => {
   const engineListContainer = document.getElementById('engineList');
   const addEngineBtn = document.getElementById('addEngineBtn');
 
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+  const searxngEndpointInput = document.getElementById('searxngEndpointInput');
+  const saveSearxngBtn = document.getElementById('saveSearxngBtn');
+
   if (settingsBtn && settingsModal) {
+    if (searxngEndpointInput) {
+      searxngEndpointInput.value = localStorage.getItem('eyefind_searxng_endpoint') || 'http://localhost:8080';
+    }
+
+    if (saveSearxngBtn && searxngEndpointInput) {
+      saveSearxngBtn.addEventListener('click', () => {
+        localStorage.setItem('eyefind_searxng_endpoint', searxngEndpointInput.value.trim());
+        alert('SearXNG endpoint saved!');
+      });
+    }
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        const target = document.getElementById(btn.dataset.target);
+        if (target) target.classList.add('active');
+      });
+    });
     settingsBtn.addEventListener('click', (e) => {
       e.preventDefault();
       populateSettings();
@@ -455,3 +491,58 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 });
+
+// --- SearXNG Results Logic ---
+function fetchSearxngResults(q) {
+  if (!q) return;
+  let endpoint = localStorage.getItem('eyefind_searxng_endpoint') || 'http://localhost:8080';
+  endpoint = endpoint.trim().replace(/\/+$/, '');
+  if (!/^https?:\/\//i.test(endpoint)) {
+    endpoint = 'http://' + endpoint;
+  }
+  
+  const resultsContainer = document.getElementById('search-results-container');
+  const searchTitle = document.querySelector('.search-result p');
+  if (searchTitle) {
+    searchTitle.textContent = `Results for: ${q}`;
+  }
+  
+  if (resultsContainer) {
+    resultsContainer.innerHTML = '<p style="padding: 15px; font-size: 1.4rem;">Loading results...</p>';
+    fetch(`${endpoint}/search?q=${encodeURIComponent(q)}&format=json`)
+      .then(res => {
+        if (!res.ok) throw new Error('Network response was not ok');
+        return res.json();
+      })
+      .then(data => {
+        resultsContainer.innerHTML = '';
+        if (data.results && data.results.length > 0) {
+          data.results.forEach(result => {
+            const resultSec = document.createElement('section');
+            resultSec.className = 'result-content';
+            
+            let html = `
+              <div class="result-content__img">
+                <a href="${result.url}" target="_blank">
+                  <img src="${result.thumbnail || './assets/img/eyefind-info-preview.png'}" alt="Result Image" style="object-fit: cover; width: 100%; height: 100%;">
+                </a>
+              </div>
+              <div class="result-content__text">
+                <a href="${result.url}" target="_blank" style="font-size: 1.6rem; color: var(--dark-blue); text-decoration: none; display: block; margin-bottom: 5px;">${result.title || result.url}</a>
+                <p style="font-size: 1.4rem; line-height: 1.8rem;">${result.content || ''}</p>
+                <p style="font-size: 1.2rem; color: var(--dark-gray); margin-top: 5px;">${result.url}</p>
+              </div>
+            `;
+            resultSec.innerHTML = html;
+            resultsContainer.appendChild(resultSec);
+          });
+        } else {
+          resultsContainer.innerHTML = '<p style="padding: 15px; font-size: 1.4rem;">No results found.</p>';
+        }
+      })
+      .catch(err => {
+        console.error('SearXNG fetch error:', err);
+        resultsContainer.innerHTML = '<p style="padding: 15px; font-size: 1.4rem;">Error fetching results. Check your endpoint settings and ensure CORS is enabled.</p>';
+      });
+  }
+}
