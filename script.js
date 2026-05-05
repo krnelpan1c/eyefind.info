@@ -500,13 +500,13 @@ function fetchSearxngResults(q) {
   if (!/^https?:\/\//i.test(endpoint)) {
     endpoint = 'http://' + endpoint;
   }
-  
+
   const resultsContainer = document.getElementById('search-results-container');
   const searchTitle = document.querySelector('.search-result p');
   if (searchTitle) {
     searchTitle.textContent = `Results for: ${q}`;
   }
-  
+
   if (resultsContainer) {
     resultsContainer.innerHTML = '<p style="padding: 15px; font-size: 1.4rem;">Loading results...</p>';
     fetch(`${endpoint}/search?q=${encodeURIComponent(q)}&format=json`)
@@ -520,11 +520,11 @@ function fetchSearxngResults(q) {
           data.results.forEach(result => {
             const resultSec = document.createElement('section');
             resultSec.className = 'result-content';
-            
+
             let html = `
               <div class="result-content__img">
                 <a href="${result.url}" target="_blank">
-                  <img src="${result.thumbnail || './assets/img/eyefind-info-preview.png'}" alt="Result Image" style="object-fit: cover; width: 100%; height: 100%;">
+                  <img src="${result.thumbnail || './assets/img/weblink-preview.png'}" alt="Result Image" style="object-fit: cover; width: 100%; height: 100%;">
                 </a>
               </div>
               <div class="result-content__text">
